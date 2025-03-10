@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/rendering.dart';
@@ -64,7 +66,51 @@ class _ListPageState extends State<_ListPage> {
         } else if (!snapshot.hasData) {
           return Center(child: Text("할 일이 없습니다."));
         } else {
-          return Center(child: Text("데이터 수신 성공!"));
+          // return Center(child: Text("데이터 수신 성공!"));
+          return ListView.builder(
+            itemCount: snapshot.data!.length,
+            itemBuilder: (context, index) {
+              // return Text("${snapshot.data![index].title}");
+              return Card(
+                child: ListTile(
+                  tileColor:
+                      snapshot.data![index].completed
+                          ? Colors.lightGreenAccent
+                          : Colors.white,
+                  leading: Checkbox(
+                    value: snapshot.data![index].completed,
+                    onChanged: (bool? value) {
+                      //  Todo: 서버로 완료 여부 전송(PUT)
+                      setState(() {
+                        snapshot.data![index].completed = value ?? false;
+                      });
+                    },
+                  ),
+                  title: Text(
+                    snapshot.data![index].title,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      IconButton(
+                        icon: Icon(Icons.edit),
+                        onPressed: () {
+                          //  Todo: 수정 폼으로 이동
+                        },
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.delete),
+                        onPressed: () {
+                          //  Todo: 수정 폼으로 이동, 서버로 DELETE api 호출
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          );
         }
       },
     );
