@@ -34,15 +34,18 @@ class _ListPage extends StatefulWidget {
 }
 
 class _ListPageState extends State<_ListPage> {
+  //  상수
+  static const String API_ENDPOINT = "http://43.201.46.192:18088/api/todos";
+
   //  상태 정의
   //  late: 선언 시 할당하지 않고, 나중에 할당되는 변수
   late Future<List<TodoItemVo>> todoListFuture;
 
   //  상태 초기화: 처음 단 한번 발생
-  // @override
-  // void initState() {
-  //   super.initState();
-  // }
+  @override
+  void initState() {
+    super.initState();
+  }
 
   //  의존성이 변경될 때
   @override
@@ -79,10 +82,17 @@ class _ListPageState extends State<_ListPage> {
                           : Colors.white,
                   leading: Checkbox(
                     value: snapshot.data![index].completed,
-                    onChanged: (bool? value) {
-                      //  Todo: 서버로 완료 여부 전송(PUT)
+                    onChanged: (bool? value) async {
+                      // setState(() {
+                      //   snapshot.data![index].completed = value ?? false;
+                      // })
+                      //  전송할 데이터
+                      TodoItemVo item = snapshot.data![index];
+                      TodoItemVo updatedItem = await toggleTodoItemCompleted(
+                        item,
+                      );
                       setState(() {
-                        snapshot.data![index].completed = value ?? false;
+                        snapshot.data![index] = updatedItem;
                       });
                     },
                   ),
@@ -126,7 +136,7 @@ class _ListPageState extends State<_ListPage> {
       dio.options.headers['Content-Type'] = "application/json";
 
       //  서버로 목록 요청
-      final response = await dio.get("http://43.201.46.192:18088/api/todos");
+      final response = await dio.get(API_ENDPOINT);
 
       //  응답
       if (response.statusCode == 200) {
@@ -153,6 +163,32 @@ class _ListPageState extends State<_ListPage> {
       }
     } catch (e) {
       throw Exception("할 일 목록을 불러오는데 실패했습니다: $e");
+    }
+  }
+
+  //  TodoItem의 completed 필드를 toggle 하는 함수
+  Future<TodoItemVo> toggleTodoItemCompleted(TodoItemVo item) async {
+    try {
+      //  completed 필드 반전
+      item.completed = !item.completed;
+
+      var dio = Dio(); //  초기화
+      dio.options.headers['content-Type'] = 'application/json';
+
+      //  데이터 갱식: PUT
+      final response = await dio.put(
+        "$API_ENDPOINT/${item.id}",
+        data: item.toJson(),
+      );
+
+      if (response.statusCode == 200) {
+        print('TodoItem completed의 상태가 변경되었습니다.');
+        return TodoItemVo.fromJson(response.data);
+      } else {
+        throw Exception("API 서버 에러");
+      }
+    } catch (e) {
+      throw Exception("TodoItem 상태를 변경하는데 실패했습니다: $e");
     }
   }
 }
