@@ -19,6 +19,7 @@ class ListPage extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           //  Todo: 작성 폼으로 이동
+          Navigator.pushNamed(context, "/write");
         },
         child: Icon(Icons.add),
       ),
