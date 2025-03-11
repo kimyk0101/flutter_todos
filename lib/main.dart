@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_todos/list.dart';
 import 'package:flutter_todos/writeForm.dart';
+import 'package:flutter_todos/editForm.dart';
 
 void main() {
   runApp(const MyApp());
@@ -22,6 +23,7 @@ class MyApp extends StatelessWidget {
       routes: {
         "/": (context) => ListPage(),
         "/write": (content) => WriteForm(),
+        "/edit": (context) => EditForm(),
       },
     );
   }

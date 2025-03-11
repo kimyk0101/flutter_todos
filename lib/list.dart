@@ -18,7 +18,7 @@ class ListPage extends StatelessWidget {
       body: Container(color: Colors.grey[100], child: _ListPage()),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          //  Todo: 작성 폼으로 이동
+          //  작성 폼으로 이동
           Navigator.pushNamed(context, "/write");
         },
         child: Icon(Icons.add),
@@ -36,7 +36,7 @@ class _ListPage extends StatefulWidget {
 
 class _ListPageState extends State<_ListPage> {
   //  상수
-  static const String API_ENDPOINT = "http://43.201.46.192:18088/api/todos";
+  static const String apiEndpoint = "http://43.201.46.192:18088/api/todos";
 
   //  상태 정의
   //  late: 선언 시 할당하지 않고, 나중에 할당되는 변수
@@ -107,7 +107,14 @@ class _ListPageState extends State<_ListPage> {
                       IconButton(
                         icon: Icon(Icons.edit),
                         onPressed: () {
-                          //  Todo: 수정 폼으로 이동
+                          //  수정 폼으로 이동
+                          Navigator.pushNamed(
+                            context,
+                            "/edit",
+                            arguments: {
+                              "id": snapshot.data![index].id,
+                            }, //  수정 페이지로 넘길 데이터 (map)
+                          );
                         },
                       ),
                       IconButton(
@@ -145,7 +152,7 @@ class _ListPageState extends State<_ListPage> {
       dio.options.headers['Content-Type'] = "application/json";
 
       //  서버로 목록 요청
-      final response = await dio.get(API_ENDPOINT);
+      final response = await dio.get(apiEndpoint);
 
       //  응답
       if (response.statusCode == 200) {
@@ -186,7 +193,7 @@ class _ListPageState extends State<_ListPage> {
 
       //  데이터 갱신: PUT
       final response = await dio.put(
-        "$API_ENDPOINT/${item.id}",
+        "$apiEndpoint/${item.id}",
         data: item.toJson(),
       );
 
@@ -208,7 +215,7 @@ class _ListPageState extends State<_ListPage> {
       dio.options.headers['content-Type'] = 'application/json';
 
       //  서버로 DELETE 요청
-      final response = await dio.delete("$API_ENDPOINT/$id");
+      final response = await dio.delete("$apiEndpoint/$id");
 
       if (response.statusCode == 200) {
         print('TodoItem이 삭제되었습니다.');
